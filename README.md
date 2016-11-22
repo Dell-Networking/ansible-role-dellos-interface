@@ -1,4 +1,4 @@
-Interface Role for Dell EMC Networking OS
+ Interface Role for Dell EMC Networking OS
 =========================================
 
 This role facilitates the configuration of interface attributes. It supports the configuration of admin state, description, MTU, IP address, IP helper, and port mode.
@@ -14,7 +14,7 @@ ansible-galaxy install Dell-Networking.dellos-interface
 Requirements
 ------------
 
-This role requires an SSH connection for connectivity to your Dell EMC Networking OS device. You can use any of the built-in Dell EMC Networking OS connection variables, or the ``provider``
+This role requires an SSH connection for connectivity to your Dell EMC Networking device. You can use any of the built-in Dell EMC Networking OS connection variables, or the ``provider``
 dictionary.
 
 Role Variables
@@ -24,33 +24,40 @@ Role Variables
 The hostname is the value of the variable ``hostname`` that corresponds to the name of the OS device.
 This role is abstracted using the variable ``ansible_net_os_name`` that can take the following values: dellos6, dellos9 and dellos10.
 
-Any role variable with corresponding state variable setting to *absent* negates the configuration of that variable. 
-For variables with no state variable, setting empty value to the variable negates the corresponding configuration.
-The variables and its values are **case-sensitive**.
+Any role variable with a corresponding state variable setting to absent negates the configuration of that variable. 
+For variables with no state variable, setting an empty value for the variable negates the corresponding configuration.
+The variables and its values are case-sensitive.
 
 The hostname (dictionary) holds a dictionary with the interface name. The interface name can correspond to any of the valid OS interfaces with the unique interface identifier name.
 
-For physical interfaces, interface name format must be in the format `<interfacename> <tuple>`. For logical interfaces, the format is `<logical_interfacename> <id>`.
+For physical interfaces, the interface name must be in the format `<interfacename> <tuple>`. For logical interfaces, the format is `<logical_interfacename> <id>`.
 For example, the physical interface name can be ethernet 1/1/1 for OS10 devices, fortyGigE 1/1 for OS9 devices, or Te1/0/1 for OS6 devices.
-The logical interface names can be Vlan 1 or Port-channel 12 for OS9 devices, vlan 1 or port-channel 12 for OS10 and OS6 devices.
+The logical interface names can be vlan 1 or port-channel 12 for OS9 devices, vlan 1 or port-channel 12 for OS10 and OS6 devices.
 
-Note: Only supported variables for the interface type should be defined. (e.g) The variable "switchport" should not be defined for logical interface.
+```
+Note: Only define supported variables for the interface type. For example, do not define the ``switchport`` variable for a logical interface.
+```
 
-**interface name** (dictionary) holds the following keys:
+
+``interface name`` holds the following keys:
 
 |        Key | Type                      | Notes                                                                                                                                                                                     |
 |-----------:|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 |   desc  | string         | Configures a one line description for the interface. |
-| portmode | string |Configures portmode according to the type of the OS device.  OS9 devices supports portmode hybrid. OS10 and OS6 devices support portmodes access and trunk|
-| switchport | boolean: true,false*  | Used to configure an interface in layer 2 mode. For OS10 devices the default switchport mode is *access*.  |
+| portmode | string |Configures portmode according to the type of the OS device. OS9 devices support portmode hybrid. OS10 and OS6 devices support portmodes access and trunk.|
+| switchport | boolean: true, false*  | Used to configure an interface in layer 2 mode. For OS10 devices the default switchport mode is access.  |
 | admin      | string, choices: up, down*              |Configures the administrative state for the interface. Configuring the value as up administratively enables the interface; configuring the value as down administratively disables the interface. |
-| mtu        | integer                       |Configures the MTU size for layer 2 and layer 3 interfaces. For example, the MTU is in the range of 594-12000 for OS9 devices and 1280-65535 for OS10 devices. For OS6 devices, MTU is set globally. |
-| fanout     | boolean: true/false           |Configures fan-out on the port when set to true.                 |
+| mtu        | integer                       |Configures the MTU size for layer 2 and layer 3 interfaces. For example, the MTU range is 594-12000 for OS9 devices and 1280-65535 for OS10 devices. For OS6 devices, MTU is set globally. |
+| fanout     | boolean: true, false           |Configures fan-out on the port when set to true.                 |
+| ip_type_dynamic | boolean: true, false           |Configures IP address DHCP when set to true. The ``ip_and_mask`` key is ignored when set to true.  This key is only supported in OS6 and OS9.               |
+| class_vendor_identifier | string, choices: present,absent,string | Configures vendor class identifier without user-defined string when set to present. Configures vendor class identifier with user defined string, when a string is specified. This key is Ignored when ``ip_type_dynamic`` is set to false. This key is only supported in OS9 devices.       |
+|option82 | boolean: true, false* | Configures option82 with remote-id mac, if ``remote_id`` undefined. This key is Ignored when ``ip_type_dynamic`` is set to false. This key is only supported in OS9 devices. |
+|remote_id |string, choices: hostname,mac,string | Configures option82 with given ``remote-id``. Ignored when ``option82`` is set to false. This key is only supported in OS9 devices. |
 |ip_and_mask | string |Configures specified IP address to the interface on OS9 and OS10 devices. Configures specified IP address to the interface VLAN for OS6 devices. The value should be in the following format: 192.168.11.1/24 |
-|ipv6_and_mask | string |Configures specified IPv6 address to the interface on OS9 and OS10 devices. Configures specified IPv6 address to the interface VLAN for OS6 devices. The value should be in the following format: 2001:4898:5808:ffa2::1/126 |
-| state_ipv6     | string, choices: absent,present*           | This key is valid only for OS10 devices. The key with value *absent* deletes the IPv6 address of the interface.                 |
-| ipv6_reachabletime       | integer                       | Configures the reachability time for IPv6 neighbor discovery. The value is in the range of 0-3600000. For OS10 devices, this variable is not supported. |
-| ip_helper | list | This key contains objects to configure DHCP server address. See the following ip_helper.* keys for each list item. |
+|ipv6_and_mask | string |Configures a specified IPv6 address to the interface on OS9 and OS10 devices. Configures a specified IPv6 address to the interface VLAN for OS6 devices. The value must be in the following format: 2001:4898:5808:ffa2::1/126 |
+| state_ipv6     | string, choices: absent, present*           | Valid only for OS10 devices. The key with the setting absent deletes the IPv6 address of the interface.                 |
+| ipv6_reachabletime       | integer                       | Configures the reachability time for IPv6 neighbor discovery. The time range is 0-3600000. For OS10 devices, this variable is not supported. |
+| ip_helper | list | Contains objects to configure the DHCP server address. See the following ip_helper.* keys for each list item. |
 | ip_helper.ip | string (required)         | Configures the IPv4 address of the DHCP Server. The value must be in the form of A.B.C.D  |
 |    ip_helper.state | string, choices: absent, present* | The absent setting deletes the IP helper address.                                                                                                                                 |
 
@@ -65,17 +72,17 @@ Ansible Dell EMC Networking roles require the following connection information t
 communication with the nodes in your inventory. This information can exist in
 the Ansible group_vars or host_vars directories, or in the playbook itself.
 
+
 |         Key | Required | Choices    | Description                              |
 | ----------: | -------- | ---------- | ---------------------------------------- |
-|        host | yes      |            | The host name or address for connecting to the remote device over the specified *transport*. The value of *host* is the destination address for the transport. |
-|        port | no       |            | The port used to build the connection to the remote device.  If the task does not specify the value, the port value defaults to 22. |
-|    username | no       |            | Configures the username that authenticates the connection to the remote device. The value of *username* authenticates the CLI login. If the task does not specify the value, the value of environment variable ANSIBLE_NET_USERNAME is used instead. |
-|    password | no       |            | Specifies the password that authenticates the connection to the remote device. If the task does not specify the value, the value of environment variable ANSIBLE_NET_PASSWORD is used instead. |
-|   authorize | no       | yes, no*   | Instructs the module to enter privileged mode on the remote device before sending any commands. If not specified, the device attempts to execute all commands in non-privileged mode. If the task does not specify the value, the value of environment variable ANSIBLE_NET_AUTHORIZE is used instead. |
-|   auth_pass | no       |            | Specifies the password to use if required to enter privileged mode on the remote device. If *authorize=no*, then this argument does nothing. If the task does not specify the value, the value of environment variable ANSIBLE_NET_AUTH_PASS is used instead. |
-|   transport | yes      | cli*       | Configures the transport connection to use when connecting to the remote device. The *transport* argument supports connectivity to the device over CLI (SSH).  |
-|    provider | no       |            | Convenient method that passes all of the above connection arguments as a dict object. All constraints (required, choices, etc.) must be met either by individual arguments or values in this dict. |
-
+|        host | yes      |            | Hostname or address for connecting to the remote device over the specified ``transport``. The value of this key is the destination address for the transport. |
+|        port | no       |            | Port used to build the connection to the remote device. If this key does not specify the value, the value defaults to 22. |
+|    username | no       |            | Configures the username that authenticates the connection to the remote device. The value of this key authenticates the CLI login. If this key does not specify the value, the value of environment variable ANSIBLE_NET_USERNAME is used instead. |
+|    password | no       |            | Specifies the password that authenticates the connection to the remote device. If this key does not specify the value, the value of environment variable ANSIBLE_NET_PASSWORD is used instead. |
+|   authorize | no       | yes, no*   | Instructs the module to enter privileged mode on the remote device before sending any commands. If this key does not specify the value, the value of environment variable ANSIBLE_NET_AUTHORIZE is used instead. If not specified, the device attempts to execute all commands in non-privileged mode.|
+|   auth_pass | no       |            | Specifies the password to use if required to enter privileged mode on the remote device. If this key is set to no, then this argument not applicable. If the ``auth_pass`` does not specify the value, the value of environment variable ANSIBLE_NET_AUTH_PASS is used instead. |
+|   transport | yes      | cli*       | Configures the transport connection to use when connecting to the remote device. This key supports connectivity to the device over CLI (SSH).  |
+|    provider | no       |            | Convenient method that passes all of the above connection arguments as a dictonary object. All constraints (such as required or choices) must be met either by individual arguments or values in this dictonary. |
 
 ```
 Note: Asterisk (*) denotes the default value if none is specified.
@@ -90,13 +97,12 @@ These modules were added in Ansible version 2.2.0.
 
 Example Playbook
 ----------------
-The following example uses the delllos-interface role to setup description, MTU, admin status, portmode, and switchport details for an interface. This example creates a ``hosts`` file with the switch, then a corresponding ``host_vars`` file, and
+The following example uses the delllos-interface role to set up description, MTU, admin status, portmode, and switchport details for an interface. This example creates a ``hosts`` file with the switch, a corresponding ``host_vars`` file, and
 then a simple playbook that references the dellos-interface role.
 
 Sample ``hosts`` file:
 
-    [spine]
-    spine1
+    spine1 ansible_host= <ip_address> ansible_net_os_name= <OS name(dellos9/dellos6/dellos10)>
 
 Sample ``host_vars/spine1``:
     
@@ -121,6 +127,17 @@ Sample ``vars/main.yaml``:
            admin: up
            ip_and_mask: "192.168.11.1/24"
            ipv6_and_mask: 2001:4898:5808:ffa2::12/126
+
+        ethernet 1/1/32:
+           desc: "Connected to Core 2"
+           mtu: 2500
+           switchport: False
+           admin: up
+           ip_type_dynamic: true
+           class_vendor_identifier: "TOR 12" 
+           option82: true
+           remote_id: "Server 34"
+
         Vlan 100:
            mtu: 4096
            admin: down
@@ -132,7 +149,7 @@ Sample ``vars/main.yaml``:
                state: absent
            ipv6_reachabletime: 600000
 
-A simple playbook to setup system, ``spine.yml``:
+Simple playbook to setup system, ``spine.yml``:
 
     - hosts: spine
       roles:

@@ -9,7 +9,6 @@ dellos_interfaces:
             desc: "connected to spine1"
             portmode: trunk
             admin: up
-            option_82: True
     vlan 100:
             ip_type_dynamic: False
             ip_and_mask: 3.3.3.3 255.255.255.0
@@ -49,13 +48,6 @@ no switchport mode
 no shutdown
  {% elif intf_vars.admin == "down" %}
 shutdown
- {% endif %}
-{% endif %}
-{% if intf_vars.option_82 is defined %}
- {% if intf_vars.option_82 %}
-dhcp l2relay trust
- {% else %}
-no dhcp l2relay trust
  {% endif %}
 {% endif %}
 {% if intf_vars.ip_type_dynamic is defined %}

@@ -59,7 +59,7 @@ Note: Only define supported variables for the interface type. For example, do no
 | ipv6_reachabletime       | integer                       | Configures the reachability time for IPv6 neighbor discovery. The time range is 0-3600000. For OS10 devices, this variable is not supported. |
 | ip_helper | list | Contains objects to configure the DHCP server address. See the following ip_helper.* keys for each list item. |
 | ip_helper.ip | string (required)         | Configures the IPv4 address of the DHCP Server. The value must be in the form of A.B.C.D  |
-|    ip_helper.state | string, choices: absent, present* | The absent setting deletes the IP helper address.                                                                                                                                 |
+|    ip_helper.state | string, choices: absent, present* | Configuring this key as absent deletes the IP helper address.               |
 
 ```
 Note: Asterisk (*) denotes the default value if none is specified.
@@ -158,6 +158,10 @@ Simple playbook to setup system, ``spine.yml``:
 Then run with:
 
     ansible-playbook -i hosts spine.yml
+
+Contact
+--------
+Send general comments and feedback to: feedback-ansible-dell-networking@dell.com
 
 License
 --------

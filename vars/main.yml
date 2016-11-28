@@ -74,9 +74,8 @@ dellos_interfaces:
             desc: "Connected to Access"
             portmode: access
             admin: up
-            option_82: True
     vlan 100:
-            ip_type_dynamic: False
+            ip_type_dynamic: True
             ip_and_mask: 3.3.3.3 255.255.255.0
             ip_helper:
               - ip: 10.0.0.36
@@ -86,5 +85,7 @@ dellos_interfaces:
             ipv6_and_mask: 2001:db8:3c4d:15::/64
     vlan 102:
             ip_type_dynamic: True
+    vlan 105:
+            ip_and_mask: 1.1.1.1 255.255.255.0 
 
 

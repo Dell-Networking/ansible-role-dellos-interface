@@ -1,20 +1,26 @@
 ---
-# tasks file for dellos-interface
- - name: "Provision Interface configuration for OS10"
-   dellos10_config:
-     src: dellos10_interface.j2
-     provider: "{{ cli }}"
-   when: ansible_net_os_name == "dellos10"
-
  - name: "Provision Interface configuration for OS9"
    dellos9_config:
      src: dellos9_interface.j2
      provider: "{{ cli }}"
+#   notify: save config os9
    when: ansible_net_os_name == "dellos9"
+   register: output
+
+ - name: "Provision Interface configuration for OS10"
+   dellos10_config:
+     src: dellos10_interface.j2
+     provider: "{{ cli }}"
+#   notify: save config os10
+   when: ansible_net_os_name == "dellos10"
+   register: output
 
  - name: "Provision Interface configuration for OS6"
    dellos6_config:
      src: dellos6_interface.j2
      provider: "{{ cli }}"
+#   notify: save config os6
    when: ansible_net_os_name == "dellos6"
+   register: output
+
 

@@ -3,7 +3,7 @@
 Purpose:
 Configure interfaces on Devices.
 
-dellos_interfaces:
+dellos_interface:
   OS6:
     Te1/0/1:
             desc: "connected to spine1"
@@ -12,6 +12,7 @@ dellos_interfaces:
     vlan 100:
             ip_type_dynamic: False
             ip_and_mask: 3.3.3.3 255.255.255.0
+            suppress_ra: present
     vlan 101:
             ipv6_and_mask: 2001:db8:3c4d:15::/64
             ipv6_reachabletime: 6000
@@ -23,8 +24,8 @@ dellos_interfaces:
 
 
 ################################}
-
-{% set vars  = dellos_interfaces[hostname] %}
+{% if (dellos_interface is defined and dellos_interface) and (hostname in dellos_interface) %}
+{% set vars  = dellos_interface[hostname] %}
 
 {% for key in vars.keys() %}
 interface {{ key }}
@@ -50,24 +51,21 @@ no shutdown
 shutdown
  {% endif %}
 {% endif %}
-{% if intf_vars.ip_type_dynamic is defined %}
-  {% if intf_vars.ip_type_dynamic %}
+{% if intf_vars.ip_type_dynamic is defined and intf_vars.ip_type_dynamic %}
 ip address dhcp
+{% elif intf_vars.ip_and_mask is defined  %}
+  {% if intf_vars.ip_and_mask %}
+ip address {{ intf_vars.ip_and_mask }}
+  {% else %}
+no ip address
   {% endif %}
-{% elif intf_vars.ip_type_dynamic is defined and not intf_vars.ip_type_dynamic %}
-    {% if intf_vars.ip_and_mask is defined and intf_vars.ip_and_mask %}
-ip address {{ intf_vars.ip_and_mask }}
-    {% else %}
-no ip address
-    {% endif %}
-{% else %}
-    {% if intf_vars.ip_and_mask is defined %}
-      {% if intf_vars.ip_and_mask %}
-ip address {{ intf_vars.ip_and_mask }}
-      {% else %}
-no ip address
-      {% endif %}
-    {% endif %}
+{% endif %}
+{% if intf_vars.suppress_ra is defined %}
+   {% if intf_vars.suppress_ra == "present" %}
+ipv6 nd suppress-ra
+   {% else %}
+no ipv6 nd suppress-ra
+   {% endif %}
 {% endif %}
 {% if intf_vars.ipv6_and_mask is defined %}
  {% if intf_vars.ipv6_and_mask %}
@@ -96,4 +94,4 @@ ip helper-address {{ helper.ip }}
 {% endif %}
 exit
 {% endfor %}
-
+{% endif %}

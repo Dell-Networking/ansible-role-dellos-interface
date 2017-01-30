@@ -3,15 +3,16 @@
 Purpose:
 Configure interfaces on OS9 Devices.
 
-dellos_interfaces:
+dellos_interface:
   OS9:
     fortyGigE 0/36:
             desc: "OS9 intf"
-            portmode: False
+            portmode: hybrid
             mtu: 2000
             switchport: False
             admin: up
             ip_and_mask: "192.168.13.1/24"
+            suppress_ra: present
             ip_type_dynamic: true
             ipv6_and_mask: 2001:4898:5808:ffa2::9/126
             ipv6_reachabletime: 60000
@@ -24,8 +25,8 @@ dellos_interfaces:
             fanout: True
 
 ####################################################}
-
-{% set vars  = dellos_interfaces[hostname] %}
+{% if (dellos_interface is defined and dellos_interface) and (hostname in dellos_interface) %}
+{% set vars  = dellos_interface[hostname] %}
 {% for key in vars.keys() %}
 {% set intf_vars  = vars[key] %}
 
@@ -43,25 +44,31 @@ no stack-unit {{ port[0] }} port {{ port[1] }} portmode quad
 interface {{ key }}
   {% if intf_vars.desc is defined %}
     {% if intf_vars.desc %}
- description "{{ intf_vars.desc }}"
+ description {{ intf_vars.desc }}
     {% else %}
  no description
     {% endif %}
   {% endif %}
-
-  {% if intf_vars.switchport is defined %}
-    {% if intf_vars.switchport %}
- switchport
-    {% else %}
+  
+  {% if intf_vars.portmode is defined %}
+    {% if intf_vars.switchport is defined and intf_vars.switchport == False %}
  no switchport
     {% endif %}
-  {% endif %}
-
-  {% if intf_vars.portmode is defined %}
     {% if intf_vars.portmode %}
  portmode {{ intf_vars.portmode}}
     {% else %}
  no portmode hybrid
+    {% endif %}
+  {% endif %}
+
+  {% if intf_vars.switchport is defined %}
+    {% if intf_vars.switchport == True %}
+ switchport
+    {% endif %}
+    {% if intf_vars.portmode is not defined %}
+      {% if intf_vars.switchport is defined and intf_vars.switchport == False %}
+ no switchport
+      {% endif %}
     {% endif %}
   {% endif %}
 
@@ -70,6 +77,14 @@ interface {{ key }}
  mtu {{ intf_vars.mtu }}
     {% else %}
  no mtu
+    {% endif %}
+  {% endif %}
+ 
+  {% if intf_vars.suppress_ra is defined %}
+    {% if intf_vars.suppress_ra == "present" %}
+ ipv6 nd suppress-ra
+    {% else %}
+ no ipv6 nd suppress-ra
     {% endif %}
   {% endif %}
 
@@ -163,4 +178,4 @@ interface {{ key }}
 
 {% endif %}
 {% endfor %}
-
+{% endif %}

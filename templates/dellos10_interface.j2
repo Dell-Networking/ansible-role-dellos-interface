@@ -3,7 +3,7 @@
 Purpose:
 Configure interfaces on OS10 Devices.
 
-dellos_interfaces:
+dellos_interface:
   OS10:
     ethernet1/1/31:
             desc: "OS10 intf"
@@ -12,6 +12,7 @@ dellos_interfaces:
             switchport: False
             admin: up
             ip_and_mask: "192.168.11.1/24"
+            suppress_ra: present
             ipv6_and_mask: 2001:4898:5808:ffa2::5/126
             state_ipv6: present
             ip_helper:
@@ -20,8 +21,8 @@ dellos_interfaces:
             fanout: True
 
 #####################################################}
-
-{% set vars  = dellos_interfaces[hostname] %}
+{% if (dellos_interface is defined and dellos_interface) and (hostname in dellos_interface) %}
+{% set vars  = dellos_interface[hostname] %}
 {% for key in vars.keys() %}
   {% set intf_vars  = vars[key] %}
   {% set port = key.split(" ") %}
@@ -79,6 +80,15 @@ interface {{ port[0] }}{{ port[1] }}
  no ip address
     {% endif %}
   {% endif %}
+ 
+   {% if intf_vars.suppress_ra is defined %}
+    {% if intf_vars.suppress_ra == "present" %}
+ ipv6 nd suppress-ra
+    {% else %}
+ no ipv6 nd suppress-ra
+    {% endif %}
+  {% endif %}
+
 
   {% if intf_vars.ipv6_and_mask is defined %}
     {% if intf_vars.ipv6_and_mask %}
@@ -112,4 +122,4 @@ interface {{ port[0] }}{{ port[1] }}
 
   {% endif %}
 {% endfor %}
-
+{% endif %}

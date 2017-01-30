@@ -1,0 +1,95 @@
+---
+# vars file for Dell-Networking.dellos-interface 
+
+dellos_interface:
+  spine2:
+    ethernet 1/1/32:
+            desc: "Connected to Core 2"
+            mtu: 2500    
+            portmode:
+            admin: up
+            switchport: False
+            ip_and_mask: 
+            ipv6_and_mask: 2001:4898:5809:faa2::10/126
+            state_ipv6: present
+
+    ethernet 1/1/1:
+            desc: "Connected to Leaf1"
+            portmode: "trunk"
+            switchport: True
+            admin: up
+
+    vlan 100:
+            ip_and_mask: 
+            ipv6_and_mask: 2001:4898:5808:ffaf::1/64
+            state_ipv6: present
+            ip_helper:
+               - ip: 10.0.0.33
+                 state: present
+            admin: up
+
+
+  leaf3:
+    fortyGigE 1/8:
+            desc: "Connected to Spine1"
+            portmode: 
+            switchport: False
+            suppress_ra: present
+            mtu: 2500    
+            admin: up
+            ipv6_and_mask: 2001:4898:5808:ffa2::5/126
+            ip_type_dynamic: true
+            ip_and_mask: 192.168.23.22/24
+            class_vendor_identifier: present
+            option82: true
+            remote_id: hostname
+
+
+    fortyGigE 1/9:
+            desc: "Connected to Spine2"
+            switchport: False
+            mtu: 2500    
+            admin: up
+            ip_and_mask: 192.168.234.20/31
+            ip_type_dynamic: false
+            class_vendor_identifier: absent
+            option82: true
+            remote_id: hostname
+            ipv6_and_mask: 2001:4898:5808:ffa2::9/126
+    Vlan 100:
+            mtu: 4096
+            admin: down
+            ip_and_mask: 
+            ipv6_and_mask: 2002:4898:5408:faaf::1/64
+            state_ipv6: absent
+            ip_helper:
+              - ip: 10.0.0.36
+                state: absent
+            ipv6_reachabletime: 600000
+  leaf4:
+    Te1/0/2:
+            desc: "Connected to Spine1"
+            portmode: trunk
+            admin: up
+    Te1/0/1:
+            desc: "Connected to Access"
+            portmode: access
+            admin: up
+    vlan 100:
+            ip_type_dynamic: True
+            suppress_ra: present
+            ip_and_mask: 3.3.3.3 255.255.255.0
+            ip_helper:
+              - ip: 10.0.0.36
+                state: present
+            ipv6_reachabletime: 600000
+    vlan 101:
+            ipv6_and_mask: 2001:db8:3c4d:15::/64
+            suppress_ra: absent
+    vlan 102:
+            ip_type_dynamic: True
+            suppress_ra:
+    vlan 105:
+            ip_and_mask: 1.1.1.1 255.255.255.0 
+
+

@@ -27,6 +27,7 @@ dellos_interface:
 ####################################################}
 {% if (dellos_interface is defined and dellos_interface) and (hostname in dellos_interface) %}
 {% set vars  = dellos_interface[hostname] %}
+{% if vars %}
 {% for key in vars.keys() %}
 {% set intf_vars  = vars[key] %}
 
@@ -178,4 +179,5 @@ interface {{ key }}
 
 {% endif %}
 {% endfor %}
+{% endif %}
 {% endif %}

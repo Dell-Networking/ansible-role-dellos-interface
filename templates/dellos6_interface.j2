@@ -1,10 +1,10 @@
 #jinja2: trim_blocks: True,lstrip_blocks: True
 {################################
+
 Purpose:
-Configure interfaces on Devices.
+Configure interface commands for dellos6 Devices.
 
 dellos_interface:
-  OS6:
     Te1/0/1:
             desc: "connected to spine1"
             portmode: trunk
@@ -22,14 +22,11 @@ dellos_interface:
     vlan 102:
             ip_type_dynamic: True
 
-
 ################################}
-{% if (dellos_interface is defined and dellos_interface) and (hostname in dellos_interface) %}
-{% set vars  = dellos_interface[hostname] %}
-{% if vars %}
-{% for key in vars.keys() %}
+{% if dellos_interface is defined and dellos_interface %}
+{% for key in dellos_interface.keys() %}
 interface {{ key }}
-{% set intf_vars  = vars[key] %}
+{% set intf_vars  = dellos_interface[key] %}
 {% if intf_vars.desc is defined %}
  {% if intf_vars.desc %}
 description "{{ intf_vars.desc }}"
@@ -94,5 +91,4 @@ ip helper-address {{ helper.ip }}
 {% endif %}
 exit
 {% endfor %}
-{% endif %}
 {% endif %}

@@ -1,10 +1,10 @@
 #jinja2: trim_blocks: True,lstrip_blocks: True
 {#####################################################
+
 Purpose:
-Configure interfaces on OS10 Devices.
+Configure interface commands for dellos10 Devices.
 
 dellos_interface:
-  OS10:
     ethernet1/1/31:
             desc: "OS10 intf"
             portmode: trunk
@@ -21,11 +21,9 @@ dellos_interface:
             fanout: True
 
 #####################################################}
-{% if (dellos_interface is defined and dellos_interface) and (hostname in dellos_interface) %}
-{% set vars  = dellos_interface[hostname] %}
-{% if vars %}
-{% for key in vars.keys() %}
-  {% set intf_vars  = vars[key] %}
+{% if dellos_interface is defined and dellos_interface %}
+{% for key in dellos_interface.keys() %}
+  {% set intf_vars  = dellos_interface[key] %}
   {% set port = key.split(" ") %}
 
   {% if intf_vars.fanout is defined %}
@@ -123,5 +121,4 @@ interface {{ port[0] }}{{ port[1] }}
 
   {% endif %}
 {% endfor %}
-{% endif %}
 {% endif %}

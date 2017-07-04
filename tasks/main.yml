@@ -1,5 +1,5 @@
 ---
- - name: "Provision Interface configuration for OS9"
+ - name: "Provisioning interface configuration for dellos9"
    dellos9_config:
      src: dellos9_interface.j2
      provider: "{{ cli }}"
@@ -7,7 +7,7 @@
    when: ansible_net_os_name == "dellos9"
    register: output
 
- - name: "Provision Interface configuration for OS10"
+ - name: "Provisioning interface configuration for dellos10"
    dellos10_config:
      src: dellos10_interface.j2
      provider: "{{ cli }}"
@@ -15,7 +15,7 @@
    when: ansible_net_os_name == "dellos10"
    register: output
 
- - name: "Provision Interface configuration for OS6"
+ - name: "Provisioning interface configuration for dellos6"
    dellos6_config:
      src: dellos6_interface.j2
      provider: "{{ cli }}"

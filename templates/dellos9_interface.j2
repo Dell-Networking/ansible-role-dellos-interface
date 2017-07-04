@@ -1,17 +1,21 @@
 #jinja2: trim_blocks: True,lstrip_blocks: True
 {###################################################
+
 Purpose:
-Configure interfaces on OS9 Devices.
+Configure interface commands for dellos9 Devices.
 
 dellos_interface:
-  OS9:
-    fortyGigE 0/36:
+    TenGigabitEthernet 1/36:
             desc: "OS9 intf"
             portmode: hybrid
             mtu: 2000
             switchport: False
             admin: up
+            auto_neg: true
+            keepalive: true
             ip_and_mask: "192.168.13.1/24"
+            ip_and_mask_secondary: "192.168.14.1/24"
+            secondary_ip_state: present
             suppress_ra: present
             ip_type_dynamic: true
             ipv6_and_mask: 2001:4898:5808:ffa2::9/126
@@ -23,13 +27,15 @@ dellos_interface:
             option82: true
             remote_id: hostname
             fanout: True
+            speed: auto
+            duplex: half
+    fortyGigE 0/8:
+            cr4_auto_neg: true
 
 ####################################################}
-{% if (dellos_interface is defined and dellos_interface) and (hostname in dellos_interface) %}
-{% set vars  = dellos_interface[hostname] %}
-{% if vars %}
-{% for key in vars.keys() %}
-{% set intf_vars  = vars[key] %}
+{% if dellos_interface is defined and dellos_interface %}
+{% for key in dellos_interface.keys() %}
+{% set intf_vars  = dellos_interface[key] %}
 
 {% set intf = key.split(" ") %}
 {% set port = intf[1].split('/') %}
@@ -80,7 +86,47 @@ interface {{ key }}
  no mtu
     {% endif %}
   {% endif %}
+
+  {% if intf_vars.keepalive is defined %}
+    {% if intf_vars.keepalive %}
+ keepalive
+    {% else %}
+ no keepalive
+    {% endif %}
+  {% endif %}
  
+  {% if intf_vars.speed is defined %}
+    {% if intf_vars.speed %}
+ speed {{ intf_vars.speed }}
+    {% else %}
+ no speed
+    {% endif %}
+  {% endif %}
+
+  {% if intf_vars.duplex is defined %}
+    {% if intf_vars.duplex %}
+ duplex {{ intf_vars.duplex }}
+    {% else %}
+ no duplex
+    {% endif %}
+  {% endif %}
+
+  {% if intf_vars.auto_neg is defined %}
+    {% if intf_vars.auto_neg %}
+ negotiation auto
+    {% else %}
+ no negotiation auto
+    {% endif %}
+  {% endif %}
+
+  {% if intf_vars.cr4_auto_neg is defined %}
+    {% if intf_vars.cr4_auto_neg %}
+ intf-type cr4 autoneg
+    {% else %}
+ no intf-type cr4 autoneg
+    {% endif %}
+  {% endif %}
+
   {% if intf_vars.suppress_ra is defined %}
     {% if intf_vars.suppress_ra == "present" %}
  ipv6 nd suppress-ra
@@ -123,19 +169,19 @@ interface {{ key }}
  ip address dhcp
       {% endif %}
     {% endif %}
-
-  {% elif intf_vars.ip_type_dynamic is defined and not intf_vars.ip_type_dynamic %}
-    {% if intf_vars.ip_and_mask is defined and intf_vars.ip_and_mask %}
- ip address {{ intf_vars.ip_and_mask }}
-    {% else %}
- no ip address
-    {% endif %}
   {% else %}
     {% if intf_vars.ip_and_mask is defined %}
       {% if intf_vars.ip_and_mask %}
  ip address {{ intf_vars.ip_and_mask }}
       {% else %}
  no ip address
+      {% endif %}
+    {% endif %}
+    {% if intf_vars.ip_and_mask_secondary is defined and intf_vars.ip_and_mask_secondary %}
+      {% if secondary_ip_state is defined and secondary_ip_state == "absent" %}
+ no ip address {{ intf_vars.ip_and_mask_secondary }} secondary
+      {% else %}
+ ip address {{ intf_vars.ip_and_mask_secondary }} secondary
       {% endif %}
     {% endif %}
   {% endif %}
@@ -179,5 +225,4 @@ interface {{ key }}
 
 {% endif %}
 {% endfor %}
-{% endif %}
 {% endif %}

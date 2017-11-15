@@ -10,13 +10,25 @@ dellos_interface:
             admin: up
             switchport: False
             ip_and_mask: 
+            ip_type_dynamic: True
+            ipv6_type_dynamic: True
+    ethernet 1/1/12:
+            desc: "ipv6 auto config"
+            mtu: 2500
+            admin: up
+            ipv6_autoconfig: True
+    ethernet 1/1/14:
+            fanout: true
+    ethernet 1/1/13:
+            desc: "set ipv6 address"
+            admin: up
             ipv6_and_mask: 2001:4898:5809:faa2::10/126
             state_ipv6: present
-
     ethernet 1/1/1:
             desc: "Connected to Leaf1"
             portmode: "trunk"
             switchport: True
+            suppress_ra: present
             admin: up
 
     vlan 100:
@@ -27,6 +39,11 @@ dellos_interface:
                - ip: 10.0.0.33
                  state: present
             admin: up
+    range ethernet 1/1/1-1/1/32:
+            mtu: 2500
+            admin: up
+            switchport: False
+
 
 # Sample variables for dellos9 device
 dellos_interface:
@@ -62,6 +79,8 @@ dellos_interface:
             option82: true
             remote_id: hostname
             ipv6_and_mask: 2001:4898:5808:ffa2::9/126
+    fortyGigE 1/12:
+            fanout: true
     Vlan 100:
             mtu: 4096
             admin: down

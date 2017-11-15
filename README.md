@@ -1,115 +1,99 @@
- Interface Role for Dell EMC Networking OS
-=========================================
+Interface role
+==============
 
-This role facilitates the configuration of interface attributes. It supports the configuration of admin state, description, MTU, IP address, IP helper, suppress_ra and port mode.
-This role is abstracted for dellos9, dellos6 and dellos10.
+This role facilitates the configuration of interface attributes. It supports the configuration of admin state, description, MTU, IP address, IP helper, suppress_ra and port mode. This role is abstracted for dellos9, dellos6, and dellos10.
+
+The interface role requires an SSH connection for connectivity to a Dell EMC Networking device. You can use any of the built-in Dell EMC Networking OS connection variables, or the *provider* dictionary.
 
 Installation
 ------------
 
-```
-ansible-galaxy install Dell-Networking.dellos-interface
-```
+    ansible-galaxy install Dell-Networking.dellos-interface
 
-Requirements
-------------
-
-This role requires an SSH connection for connectivity to your Dell EMC Networking device. You can use any of the built-in Dell EMC Networking OS connection variables, or the ``provider``
-dictionary.
-
-Role Variables
+Role variables
 --------------
 
-This role is abstracted using the variable ``ansible_net_os_name`` that can take the following values: dellos9, dellos6, dellos10.
+- Role is abstracted using the *ansible_net_os_name* variable that can take dellos9, dellos6, and dellos10 values
+- If *dellos_cfg_generate* is set to true, the variable generates the role configuration commands in a file
+- Any role variable with a corresponding state variable setting to absent negates the configuration of that variable
+- Setting an empty value for any variable negates the corresponding configuration
+- *dellos_interface* (dictionary) holds a dictionary with the interface name; interface name can correspond to any of the valid OS interfaces with the unique interface identifier name
+- For physical interfaces, the interface name must be in *<interfacename> <tuple>* format; for logical interfaces, the interface must be in *<logical_interfacename> <id>* format; physical interface name can be *fortyGigE 1/1* for dellos9 devices, *ethernet 1/1/32* for dellos10 devices, and *Te1/0/1* for dellos6 devices
+- For range of interfaces, the interface name must be in *range <interface_type> <node/slot/port[:subport]-node/slot/port[:subport]>* format;*range ethernet 1/1/1-1/1/4* as key for dellos10 devices
+- Logical interface names can be *vlan 1* or *port-channel 1* for dellos9 devices, dellos6 devices, and dellos10 devices
+- Variables and values are case-sensitive
 
-Any role variable with a corresponding state variable setting to absent negates the configuration of that variable. 
-For variables with no state variable, setting an empty value for the variable negates the corresponding configuration.
-The variables and its values are case-sensitive.
+> **NOTE**: Only define supported variables for the interface type. For example, do not define the *switchport* variable for a logical interface; do not configure portmode when *switchport* is present in dellos9 devices; do not define an IP address for physical interfaces in dellos6 devices.
 
-``dellos_interface`` (dictionary) holds a dictionary with the interface name. The interface name can correspond to any of the valid OS interfaces with the unique interface identifier name.
+**interface name keys**
 
-For physical interfaces, the interface name must be in the format `<interfacename> <tuple>`. For logical interfaces, the format is `<logical_interfacename> <id>`.
-For example, the physical interface name can be in the format fortyGigE 1/1 for dellos9 devices, ethernet 1/1/32 for dellos10 devices and Te1/0/1 for dellos6 devices.
-The logical interface names can be in the format vlan 1 or port-channel 12 for dellos9 devices, dellos6 devices and dellos10 devices.
+| Key        | Type                      | Description                                             | Support               |
+|------------|---------------------------|---------------------------------------------------------|-----------------------|
+| ``desc``  | string         | Configures a single line interface description  | dellos6, dellos9, dellos10 |
+| ``portmode`` | string | Configures port-mode according to the device type | dellos6 (access and trunk), dellos9 (hybrid), dellos10  |
+| ``switchport`` | boolean: true,false\*  | Configures an interface in L2 mode |  dellos9, dellos10 |
+| ``admin``      | string: up,down\*              | Configures the administrative state for the interface; configuring the value as up administratively enables the interface; configuring the value as down administratively disables the interface | dellos6, dellos9, dellos10 |
+| ``mtu``        | integer                       | Configures the MTU size for L2 and L3 interfaces; example, MTU range is 594 to 12000 for dellos9 devices, 1280 to 65535 on dellos10 devices, and set globally on dellos6 devices | dellos9, dellos10 |
+| ``fanout``     | boolean: true,false           | Configures fan-out on the port if set to true                | dellos9, dellos10 |
+| ``keepalive``     | boolean: true,false           | Configures keepalive on the port if set to true | dellos9          |  
+| ``speed``     | string:10,100,1000,auto           | Configures interface speed parameters | dellos9               | 
+| ``duplex``     | string: full,half           | Configures interface duplex parameters | dellos9                |
+| ``auto_neg``     | boolean: true,false           | Configures auto-negotiation mode if set to true | dellos9            | 
+| ``cr4_auto_neg``     | boolean: true,false           | Configures auto-negotiation mode on a cr4 interface type if set to true | dellos9         |
+| ``suppress_ra`` | string; present,absent     | Configures IPv6 router advertisements if set to present | dellos6, dellos9, dellos10 |
+| ``ip_type_dynamic`` | boolean: true,false           | Configures IP address DHCP if set to true (*ip_and_mask* is ignored if set to true) | dellos6, dellos9, dellos10 |
+| ``ipv6_type_dynamic`` | boolean: true,false           | Configures an IPv6 address for DHCP if set to true (*ipv6_and_mask* is ignored if set to true) | dellos10 |
+| ``ipv6_autoconfig`` | boolean: true,false           | Configures stateless configuration of IPv6 addresses if set to true (*ipv6_and_mask* is ignored if set to true) | dellos10 |
+| ``class_vendor_identifier`` | string: present,absent,string | Configures the vendor-class identifier without a user-defined string if set to present; configures a vendor-class identifier with a user-defined string when a string is specified; ignored when *ip_type_dynamic* is set to false | dellos9  |
+| ``option82`` | boolean: true,false\* | Configures option82 with the remote-id MAC address if *remote_id* is undefined; ignored when *ip_type_dynamic* is set to false | dellos9 |
+| ``remote_id`` |string: hostname,mac,string | Configures option82 with the specified *remote-id*; ignored when *option82* is set to false | dellos9  |
+| ``ip_and_mask`` | string | Configures the specified IP address to the interface on dellos9 and dellos10 devices; configures the specified IP address to the interface VLAN on dellos6 devices (192.168.11.1/24 format) | dellos6, dellos9, dellos10 |
+| ``ip_and_mask_secondary`` | string | Configures the specified IP address as secondary address to the interface on dellos9 and dellos10 devices (192.168.11.2/24 format) | dellos9 |
+| ``secondary_ip_state`` | string: absent,present\* | Deletes the secondary IP address if set to absent | dellos9    |
+| ``ipv6_and_mask`` | string | Configures a specified IPv6 address to the interface on dellos9 and dellos10 devices; configures a specified IP address to the interface VLAN on dellos6 devices (2001:4898:5808:ffa2::1/126 format) | dellos6, dellos9, dellos10 |
+| ``state_ipv6`` | string: absent,present\* | Deletes the IPV6 address if set to absent           | dellos10 | 
+| ``ipv6_reachabletime``       | integer                       | Configures the reachability time for IPv6 neighbor discovery (0 to 3600000) | dellos6, dellos9 |
+| ``ip_helper`` | list | Configures DHCP server address objects (see ``ip_helper.*``) | dellos6, dellos9, dellos10 |
+| ``ip_helper.ip`` | string (required)         | Configures the IPv4 address of the DHCP server (A.B.C.D format)  | dellos6, dellos9, dellos10 |
+| ``ip_helper.state`` | string: absent,present\* | Deletes the IP helper address if set to absent           | dellos6, dellos9, dellos10 |
 
-```
-Note: Only define supported variables for the interface type. For example, do not define the ``switchport`` variable for a logical interface; do not configure portmode when ``switchport`` is present in dellos9 devices; do not define ip address for physical interfaces in dellos6 devices.
-```
+> **NOTE**: Asterisk (*) denotes the default value if none is specified.
 
-
-``interface name`` holds the following keys:
-
-|        Key | Type                      | Notes                                                                                                                                                                                     |
-|-----------:|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|   desc  | string         | Configures a one line description for the interface. |
-| portmode | string |Configures portmode according to the type of the OS device. dellos9 devices support portmode hybrid. dellos10 and dellos6 devices support portmode access and trunk. |
-| switchport | boolean: true, false*  | Used to configure an interface in layer 2 mode. |
-| admin      | string, choices: up, down*              |Configures the administrative state for the interface. Configuring the value as up administratively enables the interface; configuring the value as down administratively disables the interface. |
-| mtu        | integer                       |Configures the MTU size for layer 2 and layer 3 interfaces. For example, the MTU range is 594-12000 for dellos9 devices, 1280-65535 on dellos10 devices and mtu is set globally on dellos6 devices.|
-| fanout     | boolean: true, false           |Configures fan-out on the port when set to true.                 |
-| keepalive     | boolean: true, false           |Configures keepalive on the port when set to true. This key is supported only in dellos9.          |  
-| speed     | string, choices:10,100,1000,auto           |Configures interface speed parameter. This key is supported only in dellos9.               | 
-| duplex     | string, choices: full,half           |Configures interface duplex parameter. This key is supported only in dellos9.                 |
-| auto_neg     | boolean: true, false           |Configures auto negotiation mode when set to true. This key is supported only in dellos9.             | 
-| cr4_auto_neg     | boolean: true, false           |Configures auto negotiation mode on cr4 interface type when set to true. This key is supported only in dellos9.         |
-| suppress_ra | string     |Configures ipv6 router advertisements if this key is set to present. |
-| ip_type_dynamic | boolean: true, false           |Configures IP address DHCP when set to true. The ``ip_and_mask`` key is ignored when set to true.This key is supported only in dellos9 and dellos6 devices. |
-| class_vendor_identifier | string, choices: present,absent,string | Configures vendor class identifier without user-defined string when set to present. Configures vendor class identifier with user defined string, when a string is specified. This key is Ignored when ``ip_type_dynamic`` is set to false.This key is supported only in dellos9 devices.  |
-|option82 | boolean: true, false* | Configures option82 with remote-id mac, if ``remote_id`` undefined. This key is Ignored when ``ip_type_dynamic`` is set to false.This key is supported only in dellos9 devices.  |
-|remote_id |string, choices: hostname,mac,string | Configures option82 with given ``remote-id``. Ignored when ``option82`` is set to false.This key is supported only in dellos9 devices.   |
-|ip_and_mask | string |Configures specified IP address to the interface on dellos9 and dellos10 devices. Configures specified IP address to the interface VLAN on dellos6 devices.The value should be in the following format: 192.168.11.1/24 |
-|ip_and_mask_secondary | string |Configures specified IP address as secondary address to the interface on dellos9 and dellos10 devices. The value should be in the following format: 192.168.11.2/24. This key is supported only in dellos9. |
-| secondary_ip_state | string, choices: absent, present* | Configuring this key as absent deletes the secondary IP address. This key is supported only in dellos9.     |
-|ipv6_and_mask | string |Configures a specified IPv6 address to the interface on dellos9 and dellos10 devices. Configures specified IP address to the interface VLAN on dellos6 devices. The value must be in the following format: 2001:4898:5808:ffa2::1/126 |
-| ipv6_reachabletime       | integer                       | Configures the reachability time for IPv6 neighbor discovery. The time range is 0-3600000.For dellos10 devices, this key is not supported.|
-| ip_helper | list | Contains objects to configure the DHCP server address. See the following ip_helper.* keys for each list item. |
-| ip_helper.ip | string (required)         | Configures the IPv4 address of the DHCP Server. The value must be in the form of A.B.C.D  |
-|    ip_helper.state | string, choices: absent, present* | Configuring this key as absent deletes the IP helper address.               |
-
-```
-Note: Asterisk (*) denotes the default value if none is specified.
-```
-
-Connection Variables
+Connection variables
 --------------------
 
-Ansible Dell EMC Networking roles require the following connection information to establish 
-communication with the nodes in your inventory. This information can exist in
-the Ansible group_vars or host_vars directories, or in the playbook itself.
+Ansible Dell EMC Networking roles require connection information to establish communication with the nodes in your inventory. This information can exist in the Ansible *group_vars* or *host_vars* directories, or in the playbook itself.
 
+| Key         | Required | Choices    | Description                                         |
+|-------------|----------|------------|-----------------------------------------------------|
+| ``host`` | yes      |            | Specifies the hostname or address for connecting to the remote device over the specified transport |
+| ``port`` | no       |            | Specifies the port used to build the connection to the remote device; if unspecified, the value defaults to 22 |
+| ``username`` | no       |            | Specifies the username that authenticates the CLI login for connection to the remote device; if value is unspecified, the ANSIBLE_NET_USERNAME environment variable value is used  |
+| ``password`` | no       |            | Specifies the password that authenticates the connection to the remote device; if value is unspecified, the ANSIBLE_NET_PASSWORD environment variable value is used |
+| ``authorize`` | no       | yes, no\*   | Instructs the module to enter privileged mode on the remote device before sending any commands; if value is unspecified, the ANSIBLE_NET_AUTHORIZE environment variable value is used, and the device attempts to execute all commands in non-privileged mode |
+| ``auth_pass`` | no       |            | Specifies the password to use if required to enter privileged mode on the remote device; if value is set to no this argument is not applicable; if *auth_pass* is unspecified, the ANSIBLE_NET_AUTH_PASS environment variable value is used |
+| ``provider`` | no       |            | Passes all connection arguments as a dictonary object; all constraints (such as required or choices) must be met either by individual arguments or values in this dictionary |
 
-|         Key | Required | Choices    | Description                              |
-| ----------: | -------- | ---------- | ---------------------------------------- |
-|        host | yes      |            | Hostname or address for connecting to the remote device over the specified ``transport``. The value of this key is the destination address for the transport. |
-|        port | no       |            | Port used to build the connection to the remote device. If this key does not specify the value, the value defaults to 22. |
-|    username | no       |            | Configures the username that authenticates the connection to the remote device. The value of this key authenticates the CLI login. If this key does not specify the value, the value of environment variable ANSIBLE_NET_USERNAME is used instead. |
-|    password | no       |            | Specifies the password that authenticates the connection to the remote device. If this key does not specify the value, the value of environment variable ANSIBLE_NET_PASSWORD is used instead. |
-|   authorize | no       | yes, no*   | Instructs the module to enter privileged mode on the remote device before sending any commands. If this key does not specify the value, the value of environment variable ANSIBLE_NET_AUTHORIZE is used instead. If not specified, the device attempts to execute all commands in non-privileged mode.|
-|   auth_pass | no       |            | Specifies the password to use if required to enter privileged mode on the remote device. If this key is set to no, then this argument not applicable. If the ``auth_pass`` does not specify the value, the value of environment variable ANSIBLE_NET_AUTH_PASS is used instead. |
-|   transport | yes      | cli*       | Configures the transport connection to use when connecting to the remote device. This key supports connectivity to the device over CLI (SSH).  |
-|    provider | no       |            | Convenient method that passes all of the above connection arguments as a dictonary object. All constraints (such as required or choices) must be met either by individual arguments or values in this dictonary. |
-
-```
-Note: Asterisk (*) denotes the default value if none is specified.
-```
+> **NOTE**: Asterisk (*) denotes the default value if none is specified.
 
 Dependencies
 ------------
 
-The Dell-Networking.dellos-interface role is built on modules included in the core Ansible code.
-These modules were added in Ansible version 2.2.0.
+The *dellos-interface* role is built on modules included in the core Ansible code. These modules were added in Ansible version 2.2.0.
 
-
-Example Playbook
+Example playbook
 ----------------
-The following example uses the Dell-Networking.dellos-interface role to set up description, MTU, admin status, portmode, and switchport details for an interface. This example creates a ``hosts`` file with the switch, a corresponding ``host_vars`` file, and then a simple playbook that references the dellos-interface role.
 
-Sample ``hosts`` file:
+This example uses the *dellos-interface* role to set up description, MTU, admin status, portmode, and switchport details for an interface. The example creates a *hosts* file with the switch details and orresponding variables. The hosts file should define the *ansible_net_os_name* variable with corresponding Dell EMC networking OS name.
+
+When *dellos_cfg_generate* is set to true, the variable generates the configuration commands as a .part file in *build_dir* path. By default it is set to false. The example writes a simple playbook that only references the *dellos-interface* role.
+
+**Sample hosts file**
 
     leaf3 ansible_host= <ip_address> ansible_net_os_name= <OS name(dellos9/dellos6/dellos10)>
 
-Sample ``host_vars/leaf3``:
-    
+**Sample host_vars/leaf3**
+
 	hostname: "leaf3"
     provider:
         host: "{{ hostname }}"
@@ -117,7 +101,7 @@ Sample ``host_vars/leaf3``:
         password: xxxxx
         authorize: yes
         auth_pass: xxxxx 
-        transport: cli
+    build_dir: ../temp/dellos9
 
     dellos_interface:
         TenGigabitEthernet 1/8:
@@ -164,30 +148,14 @@ Sample ``host_vars/leaf3``:
                 state: absent
             ipv6_reachabletime: 600000
 
-
-Simple playbook to setup system, ``leaf.yaml``:
+**Simple playbook to setup system - leaf.yaml**
 
     - hosts: leaf3
       roles:
          - Dell-Networking.dellos-interface
  
-Then run with:
+**Run**
 
     ansible-playbook -i hosts leaf.yaml
 
-License
---------
-
-Copyright (c) 2017, Dell Inc. All rights reserved.
- 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
- 
-    http://www.apache.org/licenses/LICENSE-2.0
- 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+(c) 2017 Dell EMC

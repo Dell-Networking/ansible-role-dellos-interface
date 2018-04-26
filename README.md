@@ -3,7 +3,7 @@ Interface role
 
 This role facilitates the configuration of interface attributes. It supports the configuration of admin state, description, MTU, IP address, IP helper, suppress_ra and port mode. This role is abstracted for dellos9, dellos6, and dellos10.
 
-The interface role requires an SSH connection for connectivity to a Dell EMC Networking device. You can use any of the built-in Dell EMC Networking OS connection variables, or the *provider* dictionary.
+The interface role requires an SSH connection for connectivity to a Dell EMC Networking device. You can use any of the built-in OS connection variables .
 
 Installation
 ------------
@@ -13,13 +13,13 @@ Installation
 Role variables
 --------------
 
-- Role is abstracted using the *ansible_net_os_name* variable that can take dellos9, dellos6, and dellos10 values
+- Role is abstracted using the *ansible_network_os*/*ansible_net_os_name* variable that can take dellos9, dellos6, and dellos10 values
 - If *dellos_cfg_generate* is set to true, the variable generates the role configuration commands in a file
 - Any role variable with a corresponding state variable setting to absent negates the configuration of that variable
 - Setting an empty value for any variable negates the corresponding configuration
 - *dellos_interface* (dictionary) holds a dictionary with the interface name; interface name can correspond to any of the valid OS interfaces with the unique interface identifier name
 - For physical interfaces, the interface name must be in *<interfacename> <tuple>* format; for logical interfaces, the interface must be in *<logical_interfacename> <id>* format; physical interface name can be *fortyGigE 1/1* for dellos9 devices, *ethernet 1/1/32* for dellos10 devices, and *Te1/0/1* for dellos6 devices
-- For range of interfaces, the interface name must be in *range <interface_type> <node/slot/port[:subport]-node/slot/port[:subport]>* format;*range ethernet 1/1/1-1/1/4* as key for dellos10 devices
+- For interface ranges, the interface name must be in *range <interface_type> <node/slot/port[:subport]-node/slot/port[:subport]>* format; *range ethernet 1/1/1-1/1/4* for dellos10 devices
 - Logical interface names can be *vlan 1* or *port-channel 1* for dellos9 devices, dellos6 devices, and dellos10 devices
 - Variables and values are case-sensitive
 
@@ -32,14 +32,14 @@ Role variables
 | ``desc``  | string         | Configures a single line interface description  | dellos6, dellos9, dellos10 |
 | ``portmode`` | string | Configures port-mode according to the device type | dellos6 (access and trunk), dellos9 (hybrid), dellos10  |
 | ``switchport`` | boolean: true,false\*  | Configures an interface in L2 mode |  dellos9, dellos10 |
-| ``admin``      | string: up,down\*              | Configures the administrative state for the interface; configuring the value as up administratively enables the interface; configuring the value as down administratively disables the interface | dellos6, dellos9, dellos10 |
+| ``admin``      | string: up,down\*              | Configures the administrative state for the interface; configuring the value as administratively "up" enables the interface; configuring the value as administratively "down" disables the interface | dellos6, dellos9, dellos10 |
 | ``mtu``        | integer                       | Configures the MTU size for L2 and L3 interfaces; example, MTU range is 594 to 12000 for dellos9 devices, 1280 to 65535 on dellos10 devices, and set globally on dellos6 devices | dellos9, dellos10 |
-| ``fanout``     | boolean: true,false           | Configures fan-out on the port if set to true                | dellos9, dellos10 |
+| ``fanout``     | boolean: true,false           | Configures fanout on the port if set to true                | dellos9, dellos10 |
 | ``keepalive``     | boolean: true,false           | Configures keepalive on the port if set to true | dellos9          |  
 | ``speed``     | string:10,100,1000,auto           | Configures interface speed parameters | dellos9               | 
 | ``duplex``     | string: full,half           | Configures interface duplex parameters | dellos9                |
 | ``auto_neg``     | boolean: true,false           | Configures auto-negotiation mode if set to true | dellos9            | 
-| ``cr4_auto_neg``     | boolean: true,false           | Configures auto-negotiation mode on a cr4 interface type if set to true | dellos9         |
+| ``cr4_auto_neg``     | boolean: true,false           | Configures auto-negotiation mode on a CR4 interface type if set to true | dellos9         |
 | ``suppress_ra`` | string; present,absent     | Configures IPv6 router advertisements if set to present | dellos6, dellos9, dellos10 |
 | ``ip_type_dynamic`` | boolean: true,false           | Configures IP address DHCP if set to true (*ip_and_mask* is ignored if set to true) | dellos6, dellos9, dellos10 |
 | ``ipv6_type_dynamic`` | boolean: true,false           | Configures an IPv6 address for DHCP if set to true (*ipv6_and_mask* is ignored if set to true) | dellos10 |
@@ -62,17 +62,27 @@ Role variables
 Connection variables
 --------------------
 
-Ansible Dell EMC Networking roles require connection information to establish communication with the nodes in your inventory. This information can exist in the Ansible *group_vars* or *host_vars* directories, or in the playbook itself.
+Ansible Dell EMC Networking roles require connection information to establish communication with the nodes in your inventory. This information can exist in the Ansible *group_vars* or *host_vars* directories or inventory, or in the playbook itself.
 
 | Key         | Required | Choices    | Description                                         |
 |-------------|----------|------------|-----------------------------------------------------|
-| ``host`` | yes      |            | Specifies the hostname or address for connecting to the remote device over the specified transport |
-| ``port`` | no       |            | Specifies the port used to build the connection to the remote device; if unspecified, the value defaults to 22 |
-| ``username`` | no       |            | Specifies the username that authenticates the CLI login for connection to the remote device; if value is unspecified, the ANSIBLE_NET_USERNAME environment variable value is used  |
-| ``password`` | no       |            | Specifies the password that authenticates the connection to the remote device; if value is unspecified, the ANSIBLE_NET_PASSWORD environment variable value is used |
-| ``authorize`` | no       | yes, no\*   | Instructs the module to enter privileged mode on the remote device before sending any commands; if value is unspecified, the ANSIBLE_NET_AUTHORIZE environment variable value is used, and the device attempts to execute all commands in non-privileged mode |
-| ``auth_pass`` | no       |            | Specifies the password to use if required to enter privileged mode on the remote device; if value is set to no this argument is not applicable; if *auth_pass* is unspecified, the ANSIBLE_NET_AUTH_PASS environment variable value is used |
-| ``provider`` | no       |            | Passes all connection arguments as a dictonary object; all constraints (such as required or choices) must be met either by individual arguments or values in this dictionary |
+| ``ansible_host`` | yes      |            | Specifies the hostname or address for connecting to the remote device over the
+specified transport |
+| ``ansible_port`` | no       |            | Specifies the port used to build the connection to the remote device; if value
+is unspecified, the ANSIBLE_REMOTE_PORT option is used; it defaults to 22 |
+| ``ansible_ssh_user`` | no       |            | Specifies the username that authenticates the CLI login for the connection
+to the remote device; if value is unspecified, the ANSIBLE_REMOTE_USER environment variable value is used  |
+| ``ansible_ssh_pass`` | no       |            | Specifies the password that authenticates the connection to the remote devi
+ce.  |
+| ``ansible_become`` | no       | yes, no\*   | Instructs the module to enter privileged mode on the remote device before se
+nding any commands; if value is unspecified, the ANSIBLE_BECOME environment variable value is used, and the device attempts
+to execute all commands in non-privileged mode |
+| ``ansible_become_method`` | no       | enable, sudo\*   | Instructs the module to allow the become method to be specified
+for handling privilege escalation; if value is unspecified, the ANSIBLE_BECOME_METHOD environment variable value is used. |
+| ``ansible_become_pass`` | no       |            | Specifies the password to use if required to enter privileged mode on th
+e remote device; if ``ansible_become`` is set to no this key is not applicable. |
+| ``ansible_network_os`` | yes      | dellos6/dellos9/dellos10, null\*  | This value is used to load the correct terminal an
+d cliconf plugins to communicate with the remote device. |
 
 > **NOTE**: Asterisk (*) denotes the default value if none is specified.
 
@@ -84,9 +94,9 @@ The *dellos-interface* role is built on modules included in the core Ansible cod
 Example playbook
 ----------------
 
-This example uses the *dellos-interface* role to set up description, MTU, admin status, portmode, and switchport details for an interface. The example creates a *hosts* file with the switch details and orresponding variables. The hosts file should define the *ansible_net_os_name* variable with corresponding Dell EMC networking OS name.
+This example uses the *dellos-interface* role to set up description, MTU, admin status, portmode, and switchport details for an interface. The example creates a *hosts* file with the switch details and orresponding variables. The hosts file should define the  *ansible_network_os*/*ansible_net_os_name* variable with corresponding Dell EMC networking OS name.
 
-When *dellos_cfg_generate* is set to true, the variable generates the configuration commands as a .part file in *build_dir* path. By default it is set to false. The example writes a simple playbook that only references the *dellos-interface* role.
+When *dellos_cfg_generate* is set to true, the variable generates the configuration commands as a .part file in *build_dir* path. By default, this variable is set to false. The example writes a simple playbook that only references the *dellos-interface* role.
 
 **Sample hosts file**
 
@@ -94,13 +104,13 @@ When *dellos_cfg_generate* is set to true, the variable generates the configurat
 
 **Sample host_vars/leaf3**
 
-	hostname: "leaf3"
-    provider:
-        host: "{{ hostname }}"
-        username: xxxxx
-        password: xxxxx
-        authorize: yes
-        auth_pass: xxxxx 
+    hostname: "leaf3"
+    ansible_become: yes
+    ansible_become_method: xxxxx
+    ansible_become_pass: xxxxx
+    ansible_ssh_user: xxxxx
+    ansible_ssh_pass: xxxxx
+    ansible_network_os: dellos9
     build_dir: ../temp/dellos9
 
     dellos_interface:

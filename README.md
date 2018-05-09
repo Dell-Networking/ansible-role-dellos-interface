@@ -13,7 +13,7 @@ Installation
 Role variables
 --------------
 
-- Role is abstracted using the *ansible_network_os*/*ansible_net_os_name* variable that can take dellos9, dellos6, and dellos10 values
+- Role is abstracted using the *ansible_network_os* variable that can take dellos9, dellos6, and dellos10 values
 - If *dellos_cfg_generate* is set to true, the variable generates the role configuration commands in a file
 - Any role variable with a corresponding state variable setting to absent negates the configuration of that variable
 - Setting an empty value for any variable negates the corresponding configuration
@@ -66,12 +66,9 @@ Ansible Dell EMC Networking roles require connection information to establish co
 
 | Key         | Required | Choices    | Description                                         |
 |-------------|----------|------------|-----------------------------------------------------|
-| ``ansible_host`` | yes      |            | Specifies the hostname or address for connecting to the remote device over the
-specified transport |
-| ``ansible_port`` | no       |            | Specifies the port used to build the connection to the remote device; if value
-is unspecified, the ANSIBLE_REMOTE_PORT option is used; it defaults to 22 |
-| ``ansible_ssh_user`` | no       |            | Specifies the username that authenticates the CLI login for the connection
-to the remote device; if value is unspecified, the ANSIBLE_REMOTE_USER environment variable value is used  |
+| ``ansible_host`` | yes      |            | Specifies the hostname or address for connecting to the remote device over the specified transport |
+| ``ansible_port`` | no       |            | Specifies the port used to build the connection to the remote device; if value is unspecified, the ANSIBLE_REMOTE_PORT option is used; it defaults to 22 |
+| ``ansible_ssh_user`` | no       |            | Specifies the username that authenticates the CLI login for the connection to the remote device; if value is unspecified, the ANSIBLE_REMOTE_USER environment variable value is used  |
 | ``ansible_ssh_pass`` | no       |            | Specifies the password that authenticates the connection to the remote device  |
 | ``ansible_become`` | no       | yes, no\*   | Instructs the module to enter privileged mode on the remote device before sending any commands; if value is unspecified, the ANSIBLE_BECOME environment variable value is used, and the device attempts to execute all commands in non-privileged mode |
 | ``ansible_become_method`` | no       | enable, sudo\*   | Instructs the module to allow the become method to be specified for handling privilege escalation; if value is unspecified, the ANSIBLE_BECOME_METHOD environment variable value is used |
@@ -88,14 +85,14 @@ The *dellos-interface* role is built on modules included in the core Ansible cod
 Example playbook
 ----------------
 
-This example uses the *dellos-interface* role to set up description, MTU, admin status, portmode, and switchport details for an interface. The example creates a *hosts* file with the switch details and orresponding variables. The hosts file should define the  *ansible_network_os*/*ansible_net_os_name* variable with corresponding Dell EMC networking OS name.
+This example uses the *dellos-interface* role to set up description, MTU, admin status, portmode, and switchport details for an interface. The example creates a *hosts* file with the switch details and orresponding variables. The hosts file should define the  *ansible_network_os* variable with corresponding Dell EMC networking OS name.
 
 When *dellos_cfg_generate* is set to true, the variable generates the configuration commands as a .part file in *build_dir* path. By default, this variable is set to false. The example writes a simple playbook that only references the *dellos-interface* role.
 
 **Sample hosts file**
 
-    leaf3 ansible_host= <ip_address> ansible_net_os_name= <OS name(dellos9/dellos6/dellos10)>
-
+    leaf3 ansible_host= <ip_address>
+ 
 **Sample host_vars/leaf3**
 
     hostname: "leaf3"

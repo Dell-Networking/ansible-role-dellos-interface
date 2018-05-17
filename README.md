@@ -34,7 +34,7 @@ Role variables
 | ``switchport`` | boolean: true,false\*  | Configures an interface in L2 mode |  dellos9, dellos10 |
 | ``admin``      | string: up,down\*              | Configures the administrative state for the interface; configuring the value as administratively "up" enables the interface; configuring the value as administratively "down" disables the interface | dellos6, dellos9, dellos10 |
 | ``mtu``        | integer                       | Configures the MTU size for L2 and L3 interfaces; example, MTU range is 594 to 12000 for dellos9 devices, 1280 to 65535 on dellos10 devices, and set globally on dellos6 devices | dellos9, dellos10 |
-| ``fanout``     | boolean: true,false           | Configures fanout on the port if set to true                | dellos9, dellos10 |
+| ``fanout``     | string in dellos10, boolean: true,false in dellos9  | Configures fanout on the port if set to true in dellos9 devices and to the appropriate value (10g-4x/ 40g-1x/ 25g-4x/ 100g-1x/ 50g-2x) in dellos10 devices.| dellos9, dellos10 |
 | ``keepalive``     | boolean: true,false           | Configures keepalive on the port if set to true | dellos9          |  
 | ``speed``     | string:10,100,1000,auto           | Configures interface speed parameters | dellos9               | 
 | ``duplex``     | string: full,half           | Configures interface duplex parameters | dellos9                |
@@ -69,11 +69,11 @@ Ansible Dell EMC Networking roles require connection information to establish co
 | ``ansible_host`` | yes      |            | Specifies the hostname or address for connecting to the remote device over the specified transport |
 | ``ansible_port`` | no       |            | Specifies the port used to build the connection to the remote device; if value is unspecified, the ANSIBLE_REMOTE_PORT option is used; it defaults to 22 |
 | ``ansible_ssh_user`` | no       |            | Specifies the username that authenticates the CLI login for the connection to the remote device; if value is unspecified, the ANSIBLE_REMOTE_USER environment variable value is used  |
-| ``ansible_ssh_pass`` | no       |            | Specifies the password that authenticates the connection to the remote device  |
+| ``ansible_ssh_pass`` | no       |            | Specifies the password that authenticates the connection to the remote device.  |
 | ``ansible_become`` | no       | yes, no\*   | Instructs the module to enter privileged mode on the remote device before sending any commands; if value is unspecified, the ANSIBLE_BECOME environment variable value is used, and the device attempts to execute all commands in non-privileged mode |
-| ``ansible_become_method`` | no       | enable, sudo\*   | Instructs the module to allow the become method to be specified for handling privilege escalation; if value is unspecified, the ANSIBLE_BECOME_METHOD environment variable value is used |
-| ``ansible_become_pass`` | no       |            | Specifies the password to use if required to enter privileged mode on the remote device; if ``ansible_become`` is set to no this key is not applicable |
-| ``ansible_network_os`` | yes      | dellos6/dellos9/dellos10, null\*  | Loads the correct terminal and cliconf plugins to communicate with the remote device |
+| ``ansible_become_method`` | no       | enable, sudo\*   | Instructs the module to allow the become method to be specified for handling privilege escalation; if value is unspecified, the ANSIBLE_BECOME_METHOD environment variable value is used. |
+| ``ansible_become_pass`` | no       |            | Specifies the password to use if required to enter privileged mode on the remote device; if ``ansible_become`` is set to no this key is not applicable. |
+| ``ansible_network_os`` | yes      | dellos6/dellos9/dellos10, null\*  | This value is used to load the correct terminal and cliconf plugins to communicate with the remote device. |
 
 > **NOTE**: Asterisk (*) denotes the default value if none is specified.
 
@@ -91,8 +91,8 @@ When *dellos_cfg_generate* is set to true, the variable generates the configurat
 
 **Sample hosts file**
 
-    leaf3 ansible_host= <ip_address>
- 
+    leaf3 ansible_host= <ip_address> 
+
 **Sample host_vars/leaf3**
 
     hostname: "leaf3"
@@ -159,4 +159,4 @@ When *dellos_cfg_generate* is set to true, the variable generates the configurat
 
     ansible-playbook -i hosts leaf.yaml
 
-(c) 2017 Dell Inc. or its subsidiaries. All Rights Reserved.
+(c) 2017 Dell EMC

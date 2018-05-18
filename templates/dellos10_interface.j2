@@ -20,7 +20,8 @@ dellos_interface:
             ip_helper:
               - ip: 10.0.0.36
                 state: present
-            fanout: True
+    ethernet 1/1/3:
+            fanout: 10g-4x
     range ethernet 1/1/1-1/1/4:
             switchport: True
             admin: down 
@@ -34,9 +35,9 @@ dellos_interface:
 
   {% if intf_vars.fanout is defined %}
     {% if intf_vars.fanout %}
-interface breakout {{ port[1] }} map 10g-4x
+interface breakout {{ port[1] }} map {{ intf_vars.fanout }}
     {% else %}
-interface breakout {{ port[1] }} map 40g-1x
+no interface breakout {{ port[1] }}
     {% endif %}
   {% endif %}
   {% if (intf_vars.fanout is defined and not intf_vars.fanout) or (intf_vars.fanout is not defined) %}

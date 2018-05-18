@@ -34,7 +34,7 @@ Role variables
 | ``switchport`` | boolean: true,false\*  | Configures an interface in L2 mode |  dellos9, dellos10 |
 | ``admin``      | string: up,down\*              | Configures the administrative state for the interface; configuring the value as administratively "up" enables the interface; configuring the value as administratively "down" disables the interface | dellos6, dellos9, dellos10 |
 | ``mtu``        | integer                       | Configures the MTU size for L2 and L3 interfaces; example, MTU range is 594 to 12000 for dellos9 devices, 1280 to 65535 on dellos10 devices, and set globally on dellos6 devices | dellos9, dellos10 |
-| ``fanout``     | boolean: true,false           | Configures fanout on the port if set to true                | dellos9, dellos10 |
+| ``fanout``     | string in dellos10, boolean: true,false in dellos9  | Configures fanout on the port if set to true in dellos9 devices and to the appropriate value (10g-4x/ 40g-1x/ 25g-4x/ 100g-1x/ 50g-2x) in dellos10 devices.| dellos9, dellos10 |
 | ``keepalive``     | boolean: true,false           | Configures keepalive on the port if set to true | dellos9          |  
 | ``speed``     | string:10,100,1000,auto           | Configures interface speed parameters | dellos9               | 
 | ``duplex``     | string: full,half           | Configures interface duplex parameters | dellos9                |

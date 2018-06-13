@@ -29,10 +29,9 @@ dellos_interface:
 #####################################################}
 {% if dellos_interface is defined and dellos_interface %}
 {% for key in dellos_interface.keys() %}
-  {% set intf_vars  = dellos_interface[key] %}
+  {% set intf_vars = dellos_interface[key] %}
   {% set port = key.split(" ") %}
   {% set interface_key = "" %}
-
   {% if intf_vars.fanout is defined %}
     {% if intf_vars.fanout %}
 interface breakout {{ port[1] }} map {{ intf_vars.fanout }}
@@ -40,6 +39,11 @@ interface breakout {{ port[1] }} map {{ intf_vars.fanout }}
 no interface breakout {{ port[1] }}
     {% endif %}
   {% endif %}
+{% endfor %}
+{% for key in dellos_interface.keys() %}
+  {% set intf_vars = dellos_interface[key] %}
+  {% set port = key.split(" ") %}
+  {% set interface_key = "" %}
   {% if (intf_vars.fanout is defined and not intf_vars.fanout) or (intf_vars.fanout is not defined) %}
     {% if key.startswith('range')%}
        {% set interface_key = port[0] + " " + port[1] + port[2] %}

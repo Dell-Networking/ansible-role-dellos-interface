@@ -18,7 +18,7 @@ dellos_interface:
             admin: up
             ipv6_autoconfig: True
     ethernet 1/1/14:
-            fanout: true
+            fanout: 10g-4x
     ethernet 1/1/13:
             desc: "set ipv6 address"
             admin: up
@@ -80,7 +80,9 @@ dellos_interface:
             remote_id: hostname
             ipv6_and_mask: 2001:4898:5808:ffa2::9/126
     fortyGigE 1/12:
-            fanout: true
+            fanout: single
+            fanout_speed: 40G
+            fanout_state: present
     Vlan 100:
             mtu: 4096
             admin: down

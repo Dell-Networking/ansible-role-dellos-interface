@@ -46,6 +46,8 @@ dellos_interface:
       {% if intf_vars.fanout_state is defined and intf_vars.fanout_state == "present" %}
         {% if intf_vars.fanout_speed is defined and intf_vars.fanout_speed %}
 stack-unit {{ port[0] }} port {{ port[1] }} portmode {{ intf_vars.fanout}} speed {{ intf_vars.fanout_speed }} no-confirm
+        {% else %}
+stack-unit {{ port[0] }} port {{ port[1] }} portmode {{ intf_vars.fanout }} no-confirm
         {% endif %}
       {% else %}
 no stack-unit {{ port[0] }} port {{ port[1] }} portmode {{ intf_vars.fanout }} no-confirm

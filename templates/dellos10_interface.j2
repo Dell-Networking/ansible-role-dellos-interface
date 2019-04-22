@@ -9,7 +9,7 @@ dellos_interface:
             desc: "OS10 intf"
             portmode: trunk
             mtu: 2000
-            switchport: False
+            switchport: True
             admin: up
 #            ip_type_dynamic: True
             ip_and_mask: "192.168.11.1/24"
@@ -53,7 +53,11 @@ no interface breakout {{ port[1] }}
 interface {{ interface_key }}
   {% if intf_vars.desc is defined %}
     {% if intf_vars.desc %}
+       {% if intf_vars.desc|wordcount > 1 %}
  description "{{ intf_vars.desc }}"
+       {% else %} 
+ description {{ intf_vars.desc }}
+       {% endif %}
     {% else %}
  no description
     {% endif %}
@@ -63,19 +67,9 @@ interface {{ interface_key }}
     {% if intf_vars.switchport %}
       {% if intf_vars.portmode is defined and intf_vars.portmode %}
  switchport mode {{ intf_vars.portmode }}
-      {% else %}
- switchport mode access
       {% endif %}
     {% else %}
  no switchport
-    {% endif %}
-  {% else %}
-    {% if intf_vars.portmode is defined %}
-      {% if intf_vars.portmode %}
- switchport mode {{ intf_vars.portmode }}
-      {% else %}
- no switchport
-      {% endif %}
     {% endif %}
   {% endif %}
 

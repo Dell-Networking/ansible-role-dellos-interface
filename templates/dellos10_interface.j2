@@ -63,6 +63,8 @@ interface {{ interface_key }}
     {% endif %}
   {% endif %}
 
+
+
   {% if intf_vars.switchport is defined %}
     {% if intf_vars.switchport %}
       {% if intf_vars.portmode is defined and intf_vars.portmode %}
@@ -70,6 +72,14 @@ interface {{ interface_key }}
       {% endif %}
     {% else %}
  no switchport
+    {% endif %}
+  {% else %}
+    {% if intf_vars.portmode is defined %}
+      {% if intf_vars.portmode %}
+ switchport mode {{ intf_vars.portmode }}
+      {% else %}
+ no switchport
+      {% endif %}
     {% endif %}
   {% endif %}
 

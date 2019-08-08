@@ -13,6 +13,7 @@ dellos_interface:
             admin: up
 #            ip_type_dynamic: True
             ip_and_mask: "192.168.11.1/24"
+            virtual_gateway_ip: "172.17.17.1"
             suppress_ra: present
 #            ipv6_autoconfig: True
             ipv6_and_mask: 2001:4898:5808:ffa2::5/126
@@ -20,6 +21,10 @@ dellos_interface:
             ip_helper:
               - ip: 10.0.0.36
                 state: present
+            flowcontrol:
+              mode: "receive"
+              enable: "on"
+              state: "present"
     ethernet 1/1/3:
             fanout: 10g-4x
     range ethernet 1/1/1-1/1/4:
@@ -107,6 +112,14 @@ interface {{ interface_key }}
     {% endif %}
   {% endif %}
  
+  {% if intf_vars.virtual_gateway_ip is defined %}
+    {% if intf_vars.virtual_gateway_ip %}
+ ip virtual-router address {{ intf_vars.virtual_gateway_ip }}
+    {% else %}
+ no ip virtual-router address
+    {% endif %}
+  {% endif %}
+
    {% if intf_vars.suppress_ra is defined %}
     {% if intf_vars.suppress_ra == "present" %}
  no ipv6 nd send-ra
@@ -147,6 +160,24 @@ interface {{ interface_key }}
         {% endif %}
       {% endif %}
     {% endfor %}
+  {% endif %}
+
+  {% if intf_vars.flowcontrol is defined and intf_vars.flowcontrol %}
+    {% if intf_vars.flowcontrol.mode is defined %}
+      {% if intf_vars.flowcontrol.mode %}
+        {% if intf_vars.flowcontrol.state is defined and intf_vars.flowcontrol.state == "absent" %}
+ no flowcontrol {{ intf_vars.flowcontrol.mode }}
+        {% else %}
+          {% if intf_vars.flowcontrol.enable is defined %}
+            {% if intf_vars.flowcontrol.enable == "on" %}
+ flowcontrol {{ intf_vars.flowcontrol.mode }} on
+            {% else %}
+ flowcontrol {{ intf_vars.flowcontrol.mode }} off
+            {% endif %}
+          {% endif %}
+        {% endif %}
+      {% endif %}
+    {% endif %}
   {% endif %}
 
   {% if intf_vars.admin is defined %}

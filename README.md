@@ -51,6 +51,7 @@ Role variables
 | ``remote_id`` |string: hostname,mac,string | Configures option82 with the specified *remote-id*; ignored when *option82* is set to false | dellos9  |
 | ``ip_and_mask`` | string | Configures the specified IP address to the interface on dellos9 and dellos10 devices; configures the specified IP address to the interface VLAN on dellos6 devices (192.168.11.1/24 format) | dellos6, dellos9, dellos10 |
 | ``ip_and_mask_secondary`` | string | Configures the specified IP address as secondary address to the interface on dellos9 and dellos10 devices (192.168.11.2/24 format) | dellos9 |
+| ``virtual_gateway_ip``     | string     | Configures an anycast gateway IP address for a VXLAN virtual network | dellos10  |
 | ``secondary_ip_state`` | string: absent,present\* | Deletes the secondary IP address if set to absent | dellos9    |
 | ``ipv6_and_mask`` | string | Configures a specified IPv6 address to the interface on dellos9 and dellos10 devices; configures a specified IP address to the interface VLAN on dellos6 devices (2001:4898:5808:ffa2::1/126 format) | dellos6, dellos9, dellos10 |
 | ``state_ipv6`` | string: absent,present\* | Deletes the IPV6 address if set to absent           | dellos10 | 
@@ -58,6 +59,10 @@ Role variables
 | ``ip_helper`` | list | Configures DHCP server address objects (see ``ip_helper.*``) | dellos6, dellos9, dellos10 |
 | ``ip_helper.ip`` | string (required)         | Configures the IPv4 address of the DHCP server (A.B.C.D format)  | dellos6, dellos9, dellos10 |
 | ``ip_helper.state`` | string: absent,present\* | Deletes the IP helper address if set to absent           | dellos6, dellos9, dellos10 |
+| ``flowcontrol`` | dictionary | Configures the flowcontrol attribute (see ``flowcontrol.*``) | dellos10 |
+| ``flowcontrol.mode`` | string:   receive,transmit  | Configures the flowcontrol mode   | dellos10 |
+| ``flowcontrol.enable`` | string:   on,off  | Configures the flowcontrol mode on  | dellos10 |
+| ``flowcontrol.state`` | string: absent,present\* | Deletes the flowcontrol if set to absent   | dellos10 |
 
 > **NOTE**: Asterisk (*) denotes the default value if none is specified.
 

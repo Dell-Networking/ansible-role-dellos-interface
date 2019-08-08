@@ -30,6 +30,21 @@ dellos_interface:
             switchport: True
             suppress_ra: present
             admin: up
+    ethernet 1/1/3:
+            desc: site2-spine2
+            ip_and_mask: 10.9.0.4/31
+            mtu: 9216
+            switchport: False
+            admin: up
+            flowcontrol:
+              mode: "receive"
+              enable: "on"
+              state: "present"
+    virtual-network 888:
+      desc: "virtual-network interface"
+      ip_and_mask: "172.17.17.251/24"
+      virtual_gateway_ip: "172.17.17.1"
+      admin: up
 
     vlan 100:
             ip_and_mask: 

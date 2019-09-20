@@ -2,4 +2,3 @@
 # tasks file for Dell-Networking.dellos-interface
  - name: "Provision {{ ansible_network_os }} tasks"
    include_tasks: provision_{{ ansible_network_os }}.yaml
-

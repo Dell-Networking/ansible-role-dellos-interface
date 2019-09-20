@@ -1,9 +1,7 @@
 #jinja2: trim_blocks: True,lstrip_blocks: True
 {#####################################################
-
 Purpose:
 Configure interface commands for dellos10 Devices.
-
 dellos_interface:
     ethernet 1/1/31:
             desc: "OS10 intf"
@@ -30,7 +28,6 @@ dellos_interface:
     range ethernet 1/1/1-1/1/4:
             switchport: True
             admin: down 
-
 #####################################################}
 {% if dellos_interface is defined and dellos_interface %}
 {% for key in dellos_interface.keys() %}

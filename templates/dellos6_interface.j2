@@ -1,9 +1,7 @@
 #jinja2: trim_blocks: True,lstrip_blocks: True
 {################################
-
 Purpose:
 Configure interface commands for dellos6 Devices.
-
 dellos_interface:
     Te1/0/1:
             desc: "connected to spine1"
@@ -21,7 +19,6 @@ dellos_interface:
                  state: present
     vlan 102:
             ip_type_dynamic: True
-
 ################################}
 {% if dellos_interface is defined and dellos_interface %}
 {% for key in dellos_interface.keys() %}

@@ -1,6 +1,5 @@
 ---
 # vars file for Dell-Networking.dellos-interface 
-
 # Sample variables for dellos10 device
 dellos_interface:
     ethernet 1/1/32:
@@ -58,7 +57,6 @@ dellos_interface:
             mtu: 2500
             admin: up
             switchport: False
-
 
 # Sample variables for dellos9 device
 dellos_interface:
@@ -135,5 +133,3 @@ dellos_interface:
             suppress_ra:
     vlan 105:
             ip_and_mask: 1.1.1.1 255.255.255.0 
-
-

@@ -1,10 +1,9 @@
 ---
 # tasks file for dellos10
-
  - name: "Generating interface configuration for dellos10"
    template:
       src: dellos10_interface.j2
-      dest: "{{ build_dir }}/intf10_{{hostname}}.conf.part"
+      dest: "{{ build_dir }}/intf10_{{ hostname }}.conf.part"
    when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
 #   notify: save config os10
    register: generate_output
@@ -15,4 +14,3 @@
    when: (ansible_network_os is defined and ansible_network_os == "dellos10")
 #   notify: save config os10
    register: output
-

@@ -162,7 +162,7 @@ When *dellos_cfg_generate* is set to true, the variable generates the configurat
            vrf: "green"
            desc: "virtual-network interface"
            ip_and_mask: "172.17.17.251/24"
-           ip_virtual_gateway_ip: "172.17.17.1"
+           virtual_gateway_ip: "172.17.17.1"
            admin: up
          vlan 20:
            suppress_ra: absent

@@ -40,6 +40,7 @@ dellos_interface:
               enable: "on"
               state: "present"
     virtual-network 888:
+      vrf: "green"
       desc: "virtual-network interface"
       ip_and_mask: "172.17.17.251/24"
       virtual_gateway_ip: "172.17.17.1"

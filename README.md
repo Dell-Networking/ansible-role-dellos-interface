@@ -49,6 +49,9 @@ Role variables
 | ``class_vendor_identifier`` | string: present,absent,string | Configures the vendor-class identifier without a user-defined string if set to present; configures a vendor-class identifier with a user-defined string when a string is specified; ignored when *ip_type_dynamic* is set to false | dellos9  |
 | ``option82`` | boolean: true,false\* | Configures option82 with the remote-id MAC address if *remote_id* is undefined; ignored when *ip_type_dynamic* is set to false | dellos9 |
 | ``remote_id`` |string: hostname,mac,string | Configures option82 with the specified *remote-id*; ignored when *option82* is set to false | dellos9  |
+| ``vrf`` | string | Configures the specified VRF to be associated to the interface on dellos10 devices | dellos10 |
+| ``min_ra`` | string | Configures RA minimum interval time period | dellos10 |
+| ``max_ra`` | string | Configures RA maximum interval time period | dellos10 |
 | ``ip_and_mask`` | string | Configures the specified IP address to the interface on dellos9 and dellos10 devices; configures the specified IP address to the interface VLAN on dellos6 devices (192.168.11.1/24 format) | dellos6, dellos9, dellos10 |
 | ``ip_and_mask_secondary`` | string | Configures the specified IP address as secondary address to the interface on dellos9 and dellos10 devices (192.168.11.2/24 format) | dellos9 |
 | ``virtual_gateway_ip``     | string     | Configures an anycast gateway IP address for a VXLAN virtual network | dellos10  |
@@ -144,7 +147,7 @@ When *dellos_cfg_generate* is set to true, the variable generates the configurat
           option82: true
           remote_id: hostname
           ipv6_and_mask: 2001:4898:5808:ffa2::9/126
-         Vlan 100:
+         vlan 100:
            mtu: 4096
            admin: down
            ip_and_mask:
@@ -155,6 +158,17 @@ When *dellos_cfg_generate* is set to true, the variable generates the configurat
               - ip: 10.0.0.36
                 state: absent
             ipv6_reachabletime: 600000
+         virtual-network 888:
+           vrf: "green"
+           desc: "virtual-network interface"
+           ip_and_mask: "172.17.17.251/24"
+           ip_virtual_gateway_ip: "172.17.17.1"
+           admin: up
+         vlan 20:
+           suppress_ra: absent
+           min_ra: 3
+           max_ra: 4
+           admin: up
 
 **Simple playbook to setup system - leaf.yaml**
 

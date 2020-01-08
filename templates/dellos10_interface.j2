@@ -28,6 +28,13 @@ dellos_interface:
     range ethernet 1/1/1-1/1/4:
             switchport: True
             admin: down 
+    virtual-network 100:
+            vrf: "test"
+            ip_and_mask: "15.1.1.1/24"
+            virtual_gateway_ip: "15.1.1.254"
+            admin: up
+
+
 #####################################################}
 {% if dellos_interface is defined and dellos_interface %}
 {% for key in dellos_interface.keys() %}
@@ -100,6 +107,13 @@ interface {{ interface_key }}
  no ip address
     {% endif %}
   {% else %}
+    {% if intf_vars.vrf is defined %}
+       {% if intf_vars.vrf %}
+ ip vrf forwarding {{ intf_vars.vrf }}
+       {% else %}
+ no ip address vrf
+       {% endif %}
+    {% endif %}
     {% if intf_vars.ip_and_mask is defined %}
       {% if intf_vars.ip_and_mask %}
  ip address {{ intf_vars.ip_and_mask }}
@@ -145,6 +159,20 @@ interface {{ interface_key }}
  ipv6 address {{ intf_vars.ipv6_and_mask }}
         {% endif %}
       {% endif %}
+    {% endif %}
+  {% endif %}
+  {% if intf_vars.max_ra is defined %}
+    {% if intf_vars.max_ra %}
+ ipv6 nd max-ra-interval {{ intf_vars.max_ra }}
+    {% else %}
+ no ipv6 nd max-ra-interval
+    {% endif %}
+  {% endif %}
+  {% if intf_vars.min_ra is defined %}
+    {% if intf_vars.min_ra %}
+ ipv6 nd min-ra-interval {{ intf_vars.min_ra }}
+    {% else %}
+ no ipv6 nd min-ra-interval
     {% endif %}
   {% endif %}
   {% if intf_vars.ip_helper is defined and intf_vars.ip_helper %}

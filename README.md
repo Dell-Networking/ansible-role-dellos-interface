@@ -1,9 +1,9 @@
 Interface role
 ==============
 
-This role facilitates the configuration of interface attributes. It supports the configuration of admin state, description, MTU, IP address, IP helper, suppress_ra and port mode. This role is abstracted for dellos9, dellos6, and dellos10.
+This role facilitates the configuration of interface attributes. It supports the configuration of admin state, description, MTU, IP address, IP helper, suppress_ra, and port mode. This role is abstracted for dellos9, dellos6, and dellos10.
 
-The interface role requires an SSH connection for connectivity to a Dell EMC Networking device. You can use any of the built-in OS connection variables .
+The interface role requires an SSH connection for connectivity to a Dell EMC Networking device. You can use any of the built-in OS connection variables.
 
 Installation
 ------------
@@ -33,7 +33,7 @@ Role variables
 | ``portmode`` | string | Configures port-mode according to the device type | dellos6 (access and trunk), dellos9 (hybrid), dellos10  |
 | ``switchport`` | boolean: true,false\*  | Configures an interface in L2 mode |  dellos9, dellos10 |
 | ``admin``      | string: up,down\*              | Configures the administrative state for the interface; configuring the value as administratively "up" enables the interface; configuring the value as administratively "down" disables the interface | dellos6, dellos9, dellos10 |
-| ``mtu``        | integer                       | Configures the MTU size for L2 and L3 interfaces; example, MTU range is 594 to 12000 for dellos9 devices, 1280 to 65535 on dellos10 devices, and set globally on dellos6 devices | dellos9, dellos10 |
+| ``mtu``        | integer                       | Configures the MTU size for L2 and L3 interfaces; example, MTU range 594 to 12000 for dellos9 devices, 1280 to 65535 on dellos10 devices, and set globally on dellos6 devices | dellos9, dellos10 |
 | ``fanout``     | string:dual, single, quad (dellos9); string:10g-4x, 40g-1x, 25g-4x, 100g-1x, 50g-2x (dellos10)   | Configures fanout to the appropriate value in dellos* devices.| dellos9, dellos10 |
 | ``fanout_speed`` | string: 10G, 25G, 40G, 50G | Configures speed for the fanout port based on the fanout mode specified | dellos9 |
 | ``fanout_state`` | string: present, absent* | Configures the fanout mode to a port if state is set to present | dellos9 |
@@ -54,10 +54,10 @@ Role variables
 | ``max_ra`` | string | Configures RA maximum interval time period | dellos10 |
 | ``ip_and_mask`` | string | Configures the specified IP address to the interface on dellos9 and dellos10 devices; configures the specified IP address to the interface VLAN on dellos6 devices (192.168.11.1/24 format) | dellos6, dellos9, dellos10 |
 | ``ip_and_mask_secondary`` | string | Configures the specified IP address as secondary address to the interface on dellos9 and dellos10 devices (192.168.11.2/24 format) | dellos9 |
-| ``virtual_gateway_ip``     | string     | Configures an anycast gateway IP address for a VXLAN virtual network | dellos10  |
+| ``virtual_gateway_ip``     | string     | Configures a anycast gateway IP address for a VxLAN virtual network | dellos10  |
 | ``secondary_ip_state`` | string: absent,present\* | Deletes the secondary IP address if set to absent | dellos9    |
 | ``ipv6_and_mask`` | string | Configures a specified IPv6 address to the interface on dellos9 and dellos10 devices; configures a specified IP address to the interface VLAN on dellos6 devices (2001:4898:5808:ffa2::1/126 format) | dellos6, dellos9, dellos10 |
-| ``state_ipv6`` | string: absent,present\* | Deletes the IPV6 address if set to absent           | dellos10 | 
+| ``state_ipv6`` | string: absent,present\* | Deletes the IPv6 address if set to absent           | dellos10 | 
 | ``ipv6_reachabletime``       | integer                       | Configures the reachability time for IPv6 neighbor discovery (0 to 3600000) | dellos6, dellos9 |
 | ``ip_helper`` | list | Configures DHCP server address objects (see ``ip_helper.*``) | dellos6, dellos9, dellos10 |
 | ``ip_helper.ip`` | string (required)         | Configures the IPv4 address of the DHCP server (A.B.C.D format)  | dellos6, dellos9, dellos10 |
@@ -180,4 +180,4 @@ When *dellos_cfg_generate* is set to true, the variable generates the configurat
 
     ansible-playbook -i hosts leaf.yaml
 
-(c) 2017-2019 Dell Inc. or its subsidiaries. All Rights Reserved.
+(c) 2017-2020 Dell Inc. or its subsidiaries. All Rights Reserved.

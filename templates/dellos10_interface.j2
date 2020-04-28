@@ -8,6 +8,7 @@ dellos_interface:
             portmode: trunk
             mtu: 2000
             switchport: False
+            negotiation: "auto"
             admin: up
 #            ip_type_dynamic: True
             ip_and_mask: "192.168.11.1/24"
@@ -202,6 +203,16 @@ interface {{ interface_key }}
           {% endif %}
         {% endif %}
       {% endif %}
+    {% endif %}
+  {% endif %}
+
+  {% if intf_vars.negotiation is defined %}
+    {% if intf_vars.negotiation == "on" %}
+ negotiation on
+    {% elif intf_vars.negotiation == "off" %}
+ negotiation off
+    {% elif intf_vars.negotiation == "auto" %}
+ negotiation auto
     {% endif %}
   {% endif %}
 
